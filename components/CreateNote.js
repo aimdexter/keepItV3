@@ -18,7 +18,7 @@ export default function CreateNote() {
   const handleAdd = async () => {
     if (title != "" && body != "") {
       try {
-        const docRef = await addDoc(collection(firestore, "note"), {
+        await addDoc(collection(firestore, "note"), {
           title,
           body,
           userId,

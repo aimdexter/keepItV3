@@ -2,6 +2,7 @@ import { Stack, TextInput } from "@react-native-material/core";
 import React, { useState } from "react";
 import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { auth, createUserWithEmailAndPassword } from "../firebase";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Signup({ navigation, router }) {
   const [email, setEmail] = useState("");
@@ -13,7 +14,10 @@ export default function Signup({ navigation, router }) {
     try {
       if (password === confirmPassword) {
         await createUserWithEmailAndPassword(auth, email, password);
-        navigation.navigate("Acceuil");
+        await AsyncStorage.setItem('email', email)
+        await AsyncStorage.setItem('password', password)
+        const value = await AsyncStorage.getItem('email')
++        navigation.navigate("Acceuil");
       } else {
         setError("Mots de passe ne sont pas identiques");
       }

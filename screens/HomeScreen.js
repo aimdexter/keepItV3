@@ -77,7 +77,7 @@ const HomeScreen = ({ route, navigation }) => {
             <Text style={{ fontWeight: "400", fontSize: 15 }}>Mes notes</Text>
           </View>
           <View>
-            {notes.map(({ body, title, userId, id }, i) => {
+            {notes.map(({ body, title}, i) => {
               return (
                 <TouchableOpacity
                   style={[styles.surface]}

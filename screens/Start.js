@@ -3,6 +3,8 @@ import * as LocalAuthentication from "expo-local-authentication";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { default as React, useEffect, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 import { auth } from "../firebase"; // Import the auth object from firebase
 
@@ -13,10 +15,22 @@ const Start = ({ navigation, router }) => {
   const [isBiometricSupported, setIsBiometricSupported] = React.useState(false);
   const [fingerprint, setFingerprint] = useState(false);
 
+const getvalues = async ()=>{
+  try {
+    const localemail = await AsyncStorage.getItem('email')
+    const localpassword = await AsyncStorage.getItem('password')
+    console.log(localemail);
+    console.log(localpassword);
+  } catch (error) {
+    console.log(error);
+  }
+
+}
+
+
   const loginUser = async () => {
     signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
+      .then(() => {
         navigation.navigate("Acceuil", {});
       })
       .catch((error) => {
@@ -24,8 +38,6 @@ const Start = ({ navigation, router }) => {
           setError("Adresse email ou mot de passe invalide");
         } else if (error.code === "auth/wrong-password") {
           setError("Adresse email ou mot de passe invalide");
-        } else if (error.code === "auth/email-already-in-use") {
-          setError("Adresse email existe déjà utilisée");
         } else {
           setError("Erreur");
         }
@@ -49,9 +61,24 @@ const Start = ({ navigation, router }) => {
         promptMessage: "Se connecter avec l'empreinte",
         disableDeviceFallback: true,
         cancelLabel: "Cancel",
+        
       });
       if (biometricAuth.success) {
-        navigation.navigate("Acceuil");
+        const localemail = await AsyncStorage.getItem('email')
+        const localpassword = await AsyncStorage.getItem('password')
+        signInWithEmailAndPassword(auth, localemail, localpassword)
+      .then(() => {
+        navigation.navigate("Acceuil", {});
+      })
+      .catch((error) => {
+        if (error.code === "auth/invalid-email") {
+          setError("Adresse email ou mot de passe invalide");
+        } else if (error.code === "auth/wrong-password") {
+          setError("Adresse email ou mot de passe invalide");
+        } else {
+          setError("Erreur");
+        }
+      });
       }
     } catch (error) {
       console.log(error);
