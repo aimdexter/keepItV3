@@ -61,7 +61,6 @@ const getvalues = async ()=>{
         promptMessage: "Se connecter avec l'empreinte",
         disableDeviceFallback: true,
         cancelLabel: "Cancel",
-        
       });
       if (biometricAuth.success) {
         const localemail = await AsyncStorage.getItem('email')
