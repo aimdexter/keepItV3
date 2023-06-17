@@ -9,6 +9,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  TextInput
 } from "react-native";
 import CreateNote from "../components/CreateNote";
 import { auth, firestore } from "../firebase";
@@ -17,11 +18,16 @@ const HomeScreen = ({ route, navigation }) => {
   const [notes, setNotes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [singlenote, setSinglenote] = useState({});
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredNotes, setFilteredNotes] = useState([]);
+
 
   const userID = auth.currentUser.uid;
   const collectionRef = collection(firestore, "note");
-  const userNotesQuery = query(collectionRef, where("userId", "==", userID));
-
+  const userNotesQuery = query(
+    collectionRef,
+    where("userId", "==", userID),
+  );
   const logout = async () => {
     signOut(auth)
       .then(() => {
@@ -41,10 +47,22 @@ const HomeScreen = ({ route, navigation }) => {
       });
       setIsLoading(false);
       setNotes(newNotes);
+      filterNotes(newNotes, searchQuery); 
     });
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    filterNotes(notes, searchQuery);
+  }, [notes, searchQuery]);
+
+  const filterNotes = (notes, query) => {
+    const filtered = notes.filter((note) =>
+      note.title.toLowerCase().includes(query.toLowerCase())
+    );
+    setFilteredNotes(filtered);
+  };
 
   return (
     <View>
@@ -76,8 +94,14 @@ const HomeScreen = ({ route, navigation }) => {
             />
             <Text style={{ fontWeight: "400", fontSize: 15 }}>Mes notes</Text>
           </View>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search notes"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
           <View>
-            {notes.map(({ body, title}, i) => {
+            {filteredNotes.map(({ body, title}, i) => {
               return (
                 <TouchableOpacity
                   style={[styles.surface]}
@@ -157,6 +181,14 @@ const styles = StyleSheet.create({
     borderColor: "black",
     borderWidth: 1,
   },
+  searchInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginHorizontal: 20,
+    marginBottom: 10,
+  }
 });
 
 export default HomeScreen;
