@@ -18,8 +18,8 @@ const HomeScreen = ({ route, navigation }) => {
   const [notes, setNotes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [singlenote, setSinglenote] = useState({});
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filteredNotes, setFilteredNotes] = useState([]);
+  const [searchQuery, setSearchQuery] = useState(""); // Add a new state variable to store the search query:
+  const [filteredNotes, setFilteredNotes] = useState([]); // Add a new state variable to store the result when searching
 
 
   const userID = auth.currentUser.uid;
@@ -47,12 +47,15 @@ const HomeScreen = ({ route, navigation }) => {
       });
       setIsLoading(false);
       setNotes(newNotes);
-      filterNotes(newNotes, searchQuery); 
+      filterNotes(newNotes, searchQuery); // remplissage du tableau avec les notes a partire de firebase:
     });
 
     return () => unsubscribe();
   }, []);
 
+
+  //cette fonction est responsable de requperer la valeur de recherche et filter a base d'elle 
+  //tous les note et retourn un nouveau tableau avec les notes avec le term de recherche
   useEffect(() => {
     filterNotes(notes, searchQuery);
   }, [notes, searchQuery]);
@@ -101,6 +104,7 @@ const HomeScreen = ({ route, navigation }) => {
             onChangeText={setSearchQuery}
           />
           <View>
+            {/* au lieur d'afficher les notes de firebase on les affiche a partir du nouveau tableau avec les notes rechercher */}
             {filteredNotes.map(({ body, title}, i) => {
               return (
                 <TouchableOpacity
